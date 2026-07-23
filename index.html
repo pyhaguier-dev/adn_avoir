@@ -1,0 +1,529 @@
+      <!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width,initial-scale=1">
+ 
+       
+<title>Avoir</title>
+
+<style>
+
+body{
+    margin:0;
+    overflow:hidden;
+    background:white;
+    font-family:Arial,sans-serif;
+}
+
+
+
+/* SPHERE */
+
+
+#sphere{
+    position:fixed;
+
+    top:0;
+    left:0;
+
+    width:100vw;
+    height:100vh;
+
+    overflow:hidden;
+}
+ 
+
+
+.sphereItem{
+    position:absolute;
+    left:50%;
+    transform:translate(-50%,-50%);
+    white-space:nowrap;
+    //font-weight:bold;
+}
+
+
+#openTime {
+   
+ position: fixed;
+    bottom: 2px;
+    right: 5px;
+    font-size: 4px;
+    color: #aaa;
+    opacity: 0.7;
+
+}
+
+</style>
+</head>
+
+<body>
+
+
+<div id="sphere"></div>
+
+
+<script>
+
+// ======================================
+// DATA
+// ======================================
+const numbers = ["Avoir un corps en bonne santé","Avoir un corps de rêve","Avoir une bonne dentition","Avoir un corps fort","Avoir un appareil digestif en bonne santé","Avoir un système respiratoire en bonne santé","Avoir un corps jeune","Avoir une bonne vue","Avoir un système nerveux en bonne santé","Avoir un système circulatoire en bonne santé","Avoir un système urinaire en bonne santé","Avoir un système endocrinien en bonne santé","Avoir un système musculosquelettique en bonne santé","Avoir un système reproducteur en bonne santé","Avoir un système lymphatique en bonne santé","Avoir un système tégumentaire en bonne santé","Avec un résultat immédiat","Merci"];
+// =======================
+
+// =======================
+
+
+// ======================================
+// COLORS
+// ======================================
+
+const colors = [
+
+    "red",
+    "orange",
+    "yellow",
+    "green",
+    "blue",
+    "indigo",
+    "violet"
+    
+];
+
+// ======================================
+// SPHERE
+// ======================================
+const dnaPositions = [
+    -240,
+    -180,
+    -90,
+     90,
+    180,
+    240
+];
+
+const levelCount = 60;
+const verticalSpread = 1.15;
+let sphereItems = [];
+
+let dataIndex = 0;
+
+let phase = 0;
+
+let lastMove = 0;
+
+let colorIndex = 0;
+let previousDirection = 1;
+
+// ======================================
+// CREATE ITEM
+// ======================================
+function nextIndex(i){
+
+    return (
+        i + 1
+    ) % numbers.length;
+}
+
+function prevIndex(i){
+
+    return (
+        i - 1 +
+        numbers.length
+    ) % numbers.length;
+}
+function createTopItem(){
+
+
+    let newIndex;
+
+    if(
+        sphereItems.length === 0
+    ){
+        newIndex = 0;
+    }
+    else{
+
+        newIndex =
+            nextIndex(
+                sphereItems[0].index
+            );
+    }
+const side =
+    newIndex % 2 === 0
+    ? -1
+    : 1;
+
+const xPosition =
+    dnaPositions[
+        newIndex %
+        dnaPositions.length
+    ];
+sphereItems.unshift({
+
+    index: newIndex,
+
+    value: String(
+        numbers[newIndex]
+    ),
+
+    color: colors[colorIndex],
+
+    xPosition: xPosition,
+
+    level: 0
+});
+    colorIndex =
+        (colorIndex + 1)
+        %
+        colors.length;
+}
+// ======================================
+// DRAW
+// ======================================
+
+
+
+function drawSphere(){
+console.log(
+    sphereItems[0]?.index,
+    sphereItems[
+        sphereItems.length - 1
+    ]?.index
+);
+    const sphere =
+        document.getElementById(
+            "sphere"
+        );
+
+    sphere.innerHTML = "";
+
+    const sphereHeight =
+        sphere.clientHeight;
+
+    sphereItems.forEach(item => {
+
+        const div =
+            document.createElement(
+                "div"
+            );
+
+        div.className =
+            "sphereItem";
+
+        div.innerText =
+            item.value;
+
+        div.style.color =
+            item.color;
+
+      
+const lineHeight = 45;
+
+const y =
+     -10 +
+ item.level * lineHeight;
+
+const helixWidth = 180;
+
+const side =
+    item.index % 2 === 0
+    ? 1
+    : -1;
+
+const x =
+    item.xPosition;
+        div.style.top =
+            y + "px";
+
+    div.style.left =
+    `calc(
+        50% +
+        ${item.xPosition}px
+    )`;
+
+
+        div.style.transform =
+            "translate(-50%,-50%)";
+
+        const length =
+            String(
+                item.value
+            ).length;
+
+        const fontSize =
+            Math.max(
+              
+           
+
+  18,
+        36 - length * 0.5
+
+
+            );
+
+   // div.style.fontSize = "18px";
+ div.style.fontSize =
+            fontSize + "px";
+       sphere.appendChild(div);
+
+    });
+}
+
+
+
+// ======================================
+// MOVEMENT
+// ======================================
+
+
+function moveForward(step){
+
+    sphereItems.forEach(item=>{
+        item.level += step;
+    });
+
+    sphereItems =
+        sphereItems.filter(
+            item => item.level < levelCount
+        );
+
+    if(
+        sphereItems.length === 0 ||
+        sphereItems[0].level >= 1
+    ){
+        createTopItem();
+    }
+}
+
+
+function moveBackward(step){
+
+    sphereItems.forEach(item=>{
+        item.level -= step;
+    });
+
+    sphereItems =
+        sphereItems.filter(
+            item => item.level >= 0
+        );
+
+    if(
+        sphereItems.length === 0 ||
+        sphereItems[sphereItems.length-1].level <= levelCount-2
+    ){
+
+      
+colorIndex =
+    (
+        colorIndex - 1 +
+        colors.length
+    )
+    %
+    colors.length;
+
+
+const newIndex =
+
+    sphereItems.length === 0
+    ? 0
+    : prevIndex(
+        sphereItems[
+            sphereItems.length - 1
+        ].index
+    );
+const xPosition =
+    dnaPositions[
+        newIndex %
+        dnaPositions.length
+    ];
+sphereItems.push({
+
+    index:
+        newIndex,
+
+    value:
+        String(
+            numbers[newIndex]
+        ),
+
+    color:
+        colors[colorIndex],
+ xPosition: xPosition,
+    level:
+        levelCount - 1
+
+});
+
+    }
+}
+
+// ======================================
+// SINUSOID
+// ======================================
+
+function loop(timestamp){
+
+ 
+const cycleDuration = 279.272727;
+
+    phase +=
+      (1.939393*Math.PI)
+             /
+        (cycleDuration * 60);
+
+    const wave =
+        Math.sin(
+            phase
+        );
+
+    const direction =
+        wave >= 0
+        ? 1
+        : -1;
+if(
+    direction > 0 &&
+    previousDirection < 0
+){
+
+   const bottomItem =
+    sphereItems[
+        sphereItems.length - 1
+    ];
+
+
+
+    const visibleIndex =
+        numbers.indexOf(
+            bottomItem.value
+        );
+
+    if(visibleIndex >= 0){
+
+        
+    }
+}
+
+previousDirection = direction;
+
+ const speed =
+        Math.abs(
+            wave
+        );
+           
+
+const minInterval = 90.90909; //60.606060
+const maxInterval = 323.232323; // 1939.393939
+
+
+const equivalentInterval =
+    maxInterval -
+    speed *
+    (
+        maxInterval -
+        minInterval
+    );
+
+const step =
+    30 / equivalentInterval;
+
+
+if(direction > 0){
+    moveForward(step);
+}
+else{
+    moveBackward(step);
+}
+
+drawSphere();
+
+requestAnimationFrame(
+    loop
+);
+}
+
+// ======================================
+// FULLSCREEN
+// ======================================
+
+function enterFullscreen(){
+
+    if(
+      !document.fullscreenElement
+    ){
+
+        document
+        .documentElement
+        .requestFullscreen()
+        .catch(()=>{});
+    }
+}
+
+document.addEventListener(
+    "click",
+    enterFullscreen,
+    {once:true}
+);
+
+document.addEventListener(
+    "touchstart",
+    enterFullscreen,
+    {once:true}
+);
+
+// ======================================
+// START
+// ======================================
+
+window.addEventListener(
+    "load",
+    ()=>{
+keepScreenAwake();
+      
+
+
+
+createTopItem();
+drawSphere();
+const openedAt = new Date();
+
+        requestAnimationFrame(
+            loop
+        );
+    }
+);
+      
+let wakeLock = null;
+
+async function keepScreenAwake() {
+    try {
+        wakeLock = await navigator.wakeLock.request("screen");
+
+        wakeLock.addEventListener("release", () => {
+            console.log("Wake Lock released");
+        });
+
+        console.log("Screen Wake Lock active");
+
+    } catch (err) {
+        console.log("Wake Lock error:", err);
+    }
+}
+
+document.addEventListener("visibilitychange", async () => {
+
+    if (
+        wakeLock !== null &&
+        document.visibilityState === "visible"
+    ) {
+        await keepScreenAwake();
+    }
+
+});
+
+</script>
+
+</body>
+</html>
